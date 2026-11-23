@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=61f71db5-0aec-4a02-9205-4a5b17582032
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#211f35" />
+  <title>Бесконечный Сизиф</title>
+  <meta name="description" content="Поднимай камень по бесконечной горе, преодолевая лёд, дождь, ветер и крутые склоны." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🪨</text></svg>" />
+</head>
+<body>
+  <main id="game">
+    <canvas id="canvas" aria-label="Игровое поле"></canvas>
+
+    <div id="controls-bar" class="hidden" aria-label="Системные действия">
+      <button id="btn-sound" title="Звук (M)" aria-label="Переключить звук">♪</button>
+      <button id="btn-menu" title="Главное меню (Esc)" aria-label="Вернуться в меню">⌂</button>
+      <button id="btn-reset" title="Заново (R)" aria-label="Начать заново">↻</button>
+    </div>
+
+    <section id="hud" class="hidden" aria-label="Игровой интерфейс">
+      <div class="hud-row">
+        <div class="stamina">
+          <span class="stamina-label">СИЛЫ</span>
+          <div class="stamina-bar"><div id="stamina-fill"></div></div>
+        </div>
+        <div class="scores">
+          <div class="height"><span class="hlabel">ВЫСОТА</span> <b id="height">—</b></div>
+          <div class="best">РЕКОРД <span id="best">—</span></div>
+        </div>
+      </div>
+      <div id="banner" class="banner hidden"></div>
+      <blockquote id="game-quote" class="stone-quote gameplay-quote hidden"></blockquote>
+    </section>
+
+    <section id="screen-start" class="overlay">
+      <div class="start-layout">
+        <h1>БЕСКОНЕЧНЫЙ СИЗИФ</h1>
+        <div class="title-divider" aria-hidden="true"><span></span><i></i><span></span></div>
+        <blockquote class="epigraph">«Боги приговорили Сизифа вечно вкатывать на вершину горы камень,<br>который, едва достигнув цели, скатывался вниз»</blockquote>
+
+        <article class="instruction-tablet">
+          <h2>КАК ПРЕОДОЛЕВАТЬ ПРЕПЯТСТВИЯ</h2>
+          <p>Толкай камень вверх по бесконечному склону — так высоко, как хватит сил.</p>
+          <p><strong>ЛЁД</strong> — держи <strong>SPACE</strong>, чтобы не оступиться.</p>
+          <p><strong>КРУТОЙ СКЛОН</strong> — удерживай <strong>SHIFT + SPACE</strong>.</p>
+          <p><strong>ДОЖДЬ</strong> — нажми <strong>C</strong> и продолжай толкать через <strong>SPACE</strong>; после дождя нажми <strong>C</strong> ещё раз.</p>
+          <p><strong>ВЕТЕР</strong> — замри и не трогай клавиши.</p>
+          <p class="tablet-ending">Неверные действия, идущие против природы, отнимают силы Сизифа. Как только силы иссякнут, Сизиф упадёт, и камень скатится к подножью горы.</p>
+        </article>
+
+        <button id="btn-start" class="cta primary">SPACE — НАЧАТЬ</button>
+        <button id="btn-settings" class="cta secondary">НАСТРОЙКИ СЛОЖНОСТИ</button>
+        <p class="keys-line">M — звук &nbsp;&nbsp; Esc — меню &nbsp;&nbsp; R — заново</p>
+
+        <div class="author">
+          <div class="author-logo" aria-hidden="true">
+            <span class="curl c1"></span><span class="curl c2"></span><span class="curl c3"></span>
+            <span class="curl c4"></span><span class="curl c5"></span><span class="face"></span>
+          </div>
+          <span>Автор: Иван Меркурьв</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-settings" class="overlay hidden">
+      <div class="settings-panel">
+        <h2>НАСТРОЙКИ СЛОЖНОСТИ</h2>
+        <div class="settings">
+          <label class="setrow">
+            <span class="setname">Расход сил <b id="v-drain">×1.0</b></span>
+            <input type="range" id="s-drain" min="0.5" max="2" step="0.1" />
+          </label>
+          <label class="setrow">
+            <span class="setname">Частота явлений <b id="v-freq">×1.0</b></span>
+            <input type="range" id="s-freq" min="0.5" max="2" step="0.1" />
+          </label>
+          <label class="setrow">
+            <span class="setname">Длительность ветра <b id="v-wind">×1.0</b></span>
+            <input type="range" id="s-wind" min="0.5" max="2" step="0.1" />
+          </label>
+          <label class="setrow">
+            <span class="setname">Вероятность дождя <b id="v-rain">обычная</b></span>
+            <input type="range" id="s-rain" min="0" max="3" step="0.25" />
+          </label>
+          <label class="setrow">
+            <span class="setname">Крутизна склонов <b id="v-steep">×1.0</b></span>
+            <input type="range" id="s-steep" min="0.5" max="2" step="0.1" />
+          </label>
+        </div>
+        <button id="btn-settings-back" class="cta primary">НАЗАД</button>
+        <button id="btn-settings-reset" class="cta secondary">СБРОС</button>
+      </div>
+    </section>
+
+    <section id="screen-over" class="overlay hidden">
+      <div class="over-layout">
+        <h2 id="over-reason">СИЛЫ ИССЯКЛИ</h2>
+        <p class="over-sub">Руки опустились — камень скатился к подножию.</p>
+        <div class="result">
+          <div class="result-main"><span class="hlabel">ВЫСОТА</span> <b id="over-height">—</b></div>
+          <div class="result-best">РЕКОРД <span id="over-best">—</span></div>
+          <div id="over-record" class="record-badge hidden">НОВЫЙ РЕКОРД</div>
+        </div>
+        <button id="btn-restart" class="cta primary">SPACE — ЗАНОВО</button>
+        <button id="btn-tomenu" class="cta secondary">В МЕНЮ</button>
+        <blockquote class="stone-quote defeat-quote">«Сизиф, бессильный и бунтующий, знает о бесконечности своей печальной участи»</blockquote>
+      </div>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
